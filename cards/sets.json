@@ -61,5 +61,12 @@
     "gempName": "boonta eve podrace",
     "abbr": "BP",
     "legacy": "false"
+  },
+  {
+    "id": 101,
+    "name": "vset1",
+    "gempName": "vset1",
+    "abbr": "VS1",
+    "legacy": "false"
   }
 ]

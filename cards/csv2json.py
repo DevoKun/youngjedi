@@ -7,27 +7,26 @@ import os.path
 from pathlib import Path
 
 csv_files = {
-  0: {"name":"sample deck",                   "abbr":"SMP",  "csv":"sampledeck/index.csv"},
-  1: {"name":"menace of darth maul",          "abbr":"DM",  "csv":"menaceofdarthmaul/index.csv"},
-  2: {"name":"the jedi council",              "abbr":"JC",  "csv":"thejedicouncil/index.csv"},
-  3: {"name":"battle of naboo",               "abbr":"BN",  "csv":"battleofnaboo/index.csv"},
-  4: {"name":"enhanced menace of darth maul", "abbr":"EDM", "csv":"enhancedmenaceofdarthmaul/index.csv"},
-  5: {"name":"duel of the fates",             "abbr":"DF",  "csv":"duelofthefates/index.csv"},
-  6: {"name":"enhanced battle of naboo",      "abbr":"EBN", "csv":"enhancedbattleofnaboo/index.csv"},
-  7: {"name":"reflections",                   "abbr":"RF",  "csv":"reflections/index2.csv"},
-  8: {"name":"boonta eve podrace",            "abbr":"BP",  "csv":"boontaevepodrace/index.csv"},
+  0:   {"name":"sample deck",                   "abbr":"SMP", "csv":"sampledeck/index.csv"},
+  1:   {"name":"menace of darth maul",          "abbr":"DM",  "csv":"menaceofdarthmaul/index.csv"},
+  2:   {"name":"the jedi council",              "abbr":"JC",  "csv":"thejedicouncil/index.csv"},
+  3:   {"name":"battle of naboo",               "abbr":"BN",  "csv":"battleofnaboo/index.csv"},
+  4:   {"name":"enhanced menace of darth maul", "abbr":"EDM", "csv":"enhancedmenaceofdarthmaul/index.csv"},
+  5:   {"name":"duel of the fates",             "abbr":"DF",  "csv":"duelofthefates/index.csv"},
+  6:   {"name":"enhanced battle of naboo",      "abbr":"EBN", "csv":"enhancedbattleofnaboo/index.csv"},
+  7:   {"name":"reflections",                   "abbr":"RF",  "csv":"reflections/index.csv"},
+  8:   {"name":"boonta eve podrace",            "abbr":"BP",  "csv":"boontaevepodrace/index.csv"},
+  101: {"name":"vset1",                         "abbr":"VS1", "csv":"vset1/index.csv"},
 }
 
-
-
 #Set Name Abbreviations: 
-#MDM = Menace Of Darth Maul 
-#TJC = The Jedi Council 
-#BON = Battle of Naboo 
+#MDM  = Menace Of Darth Maul 
+#TJC  = The Jedi Council 
+#BON  = Battle of Naboo 
 #EMDM = Enhanced Menace Of Darth Maul 
 #DOTF = Duel Of The Fates 
 #EBON = Enhanced Battle Of Naboo 
-#BEP = Boonta Eve Podrace (special preview) 
+#BEP  = Boonta Eve Podrace (special preview) 
 #PREM = Premium (Shmi Skywalker card only).
 
 
@@ -54,30 +53,28 @@ for i in csv_files:
     "legacy":   "false"
   })
 
-  with open(csv_file) as cf:
-    rows = csv.reader(cf, delimiter='|')
-
-    for row in rows:
+  with open(csv_file, 'r') as cf:
+    csv_file = csv.DictReader(cf, delimiter="|", quotechar="^")
+    for row in csv_file:
       if (print_row):
         print(len(row), row)
 
       if (len(row) > 0):
-        side     = row[1].strip()
-        release  = row[2].strip().lower()
-        cardtype = row[3].strip().lower()
-        cardid   = row[4].strip()
-        name     = row[5].strip()
-        image    = row[6].strip()
-        rarity   = row[7].strip().lower()
+        side     = row["side"].strip()
+        release  = row["set"].strip().lower()
+        cardtype = row["type"].strip().lower()
+        cardid   = row["id"].strip()
+        name     = row["title"].strip()
+        image    = row["image"].strip()
+        rarity   = row["rarity"].strip().lower()
         subtype  = ""
-        foil     = "false"
 
+
+
+        foil     = "false"
         if (cardid[0:1] == "F"):
           subtype = "foil"
           foil    = "true"
-
-        #if (cardid == "F8"):
-        #  print_row = True
 
 
         #print('"' + release + "\"\t\"" + cardtype + "\"\t\"" + cardid + "\"\t\"" + name + "\"\t\"" + image + "\"\t\"" + rarity + '"')
@@ -107,6 +104,37 @@ for i in csv_files:
           #  print('       *** Image missing: .'+image)
 
 
+        powercubes = list()
+        if row['powercubes1']:
+          powercubes.append(row['powercubes1'])
+        if row['powercubes2']:
+          powercubes.append(row['powercubes2'])
+        
+        powerdots = list()
+        if row['powerdots1']:
+          powerdots.append(row['powerdots1'])
+        if row['powerdots2']:
+          powerdots.append(row['powerdots2'])
+        
+        whoCanUseTheCard = list()
+        if row['whoCanUseTheCard1']:
+          whoCanUseTheCard.append(row['whoCanUseTheCard1'])
+        if row['whoCanUseTheCard2']:
+          whoCanUseTheCard.append(row['whoCanUseTheCard2'])
+
+        deploy = 0
+        if row['row1color'] != "none":
+          deploy = deploy + 1
+        if row['row2color'] != "none":
+          deploy = deploy + 1
+        if row['row3color'] != "none":
+          deploy = deploy + 1
+        if row['row4color'] != "none":
+          deploy = deploy + 1
+        if row['row5color'] != "none":
+          deploy = deploy + 1
+        if row['row6color'] != "none":
+          deploy = deploy + 1
 
 
         card = {
@@ -120,14 +148,36 @@ for i in csv_files:
           "front": {
             "title": name,
             "imageUrl": "https://res.starwarsccg.org/youngjedi/cards"+image,
-            "type": cardtype,
+            "type": row["type"],
             "subType": subtype,
-            "destiny": "9999",
-            "power": "9999",
-            "deploy": "9999",
-            "forfeit": "9999",
-            "gametext": "xxxxxxxx",
-            "lore": "yyyyyyyyy",
+            "destiny": row["destiny"],
+            "power": row["power"],
+            "deploy": deploy,
+            "forfeit": 0,
+            "gametext": "",
+            "lore": row["lore"],
+
+            "row1color": row['row1color'],
+            "row2color": row['row2color'],
+            "row3color": row['row3color'],
+            "row4color": row['row4color'],
+            "row5color": row['row5color'],
+            "row6color": row['row6color'],
+            "counters": row['counters'],
+            "damage": row['damage'],
+
+            "powercubes1": row['powercubes1'],
+            "powercubes2": row['powercubes2'],
+            "powercubes": powercubes,
+
+            "powerdots1": row['powerdots1'],
+            "powerdots2": row['powerdots2'],
+            "powerdots": powerdots,
+
+            "whoCanUseTheCard1": row['whoCanUseTheCard1'],
+            "whoCanUseTheCard2": row['whoCanUseTheCard2'],
+            "whoCanUseTheCard": whoCanUseTheCard,
+
             "extraText": [""]
           },
           "counterpart": "",
